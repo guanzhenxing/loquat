@@ -1,4 +1,3 @@
-import logging
 import os
 import signal
 import time
@@ -8,7 +7,7 @@ import tornado.ioloop
 import tornado.locks
 import tornado.web
 
-logger = logging.getLogger(__name__)
+from .log import loquat_logger
 
 # Make filepaths relative to settings.
 here = os.path.dirname(os.path.abspath(__file__))
@@ -84,21 +83,21 @@ class Application(tornado.web.Application):
 
         super(Application, self).__init__(app_config.handlers, **app_config.app_settings)
 
-        logger.debug('Inited Loquat Application')
+        loquat_logger.debug('Inited Loquat Application')
 
 
 def shutdown_sig_handler(sig, frame):
     """handle shutdown signal"""
 
-    logger.warning('caught signal: %s', sig)
+    loquat_logger.warning('caught signal: %s', sig)
 
     max_wait_seconds_before_shutdown = 1
 
     def shutdown():
-        logger.info('stopping http server')
+        loquat_logger.info('stopping http server')
         server.stop()
 
-        logger.info('will shutdown in %s seconds...', max_wait_seconds_before_shutdown)
+        loquat_logger.info('will shutdown in %s seconds...', max_wait_seconds_before_shutdown)
         io_loop = tornado.ioloop.IOLoop.instance()
 
         deadline = time.time() + max_wait_seconds_before_shutdown
@@ -108,7 +107,7 @@ def shutdown_sig_handler(sig, frame):
             if now < deadline:
                 io_loop.add_timeout(now + 1, stop_loop)
             else:
-                logger.info('shutdown')
+                loquat_logger.info('shutdown')
                 io_loop.stop()
 
         stop_loop()
@@ -124,10 +123,10 @@ def run(app_config: AppConfig):
         app_config = AppConfig()
 
     application = Application(app_config)
-
     server = tornado.httpserver.HTTPServer(application, xheaders=True)
     server.listen(app_config.port)
-    logger.info("%s started on port %s." % (app_config.app_name, app_config.port,))
+
+    loquat_logger.info("%s started on port %s." % (app_config.app_name, app_config.port,))
 
     signal.signal(signal.SIGTERM, shutdown_sig_handler)
     signal.signal(signal.SIGINT, shutdown_sig_handler)
