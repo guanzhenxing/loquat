@@ -12,7 +12,7 @@ URL = 'https://github.com/guanzhenxing/loquat.git'
 EMAIL = 'guan.zhenxing@foxmail.com'
 AUTHOR = 'Jesen Kwan'
 REQUIRES_PYTHON = '>=3.5.0'
-VERSION = '0.1.2'
+VERSION = '0.1.3'
 KEYWORDS = 'tornado,web framework'
 
 # What packages are required for this module to be executed?
