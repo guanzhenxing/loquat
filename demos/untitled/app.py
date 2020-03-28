@@ -1,26 +1,32 @@
-import logging
+import os
 
-import loquat
 from loquat import web
+from loquat.utils import utils
 
-from settings import config
+from handlers.index import IndexHandler
 
-logger = logging.getLogger(__name__)
+here = os.path.dirname(os.path.abspath(__file__))
 
 
-class UntitledApplication(loquat.web.Application):
+def _init_handlers():
+    return [
+        (r"/", IndexHandler)
+    ]
 
-    def __init__(self):
-        handlers = config['handlers']
-        port = config['port']
-        app_settings = config['app_settings']
 
-        super().__init__(port=port, handlers=handlers, **app_settings)
+def _init_app_settings():
+    return {
+        'debug': True,
+        'static_path': utils.abs_path(here, 'static'),
+        'template_path': utils.abs_path(here, 'templates')
+    }
 
 
 def main():
-    app = UntitledApplication()
-    web.run(application=app)
+    handlers = _init_handlers()
+    app_settings = _init_app_settings()
+    app_config = web.AppConfig(handlers=handlers, app_settings=app_settings, port=8080, env='DEV', app_name='untitled')
+    web.run(app_config=app_config)
 
 
 if __name__ == "__main__":

@@ -18,29 +18,29 @@ pip install loquat
 import loquat
 from loquat import web
 from loquat.handlers.base import BaseHandler
-
+from loquat.utils import utils
 
 class IndexHandler(BaseHandler):
     def get(self):
-        print(">>>")
         self.render('index.html')
 
+def _init_handlers():
+    return [
+        (r"/", IndexHandler)
+    ]
 
-class UntitledApplication(loquat.web.Application):
-
-    def __init__(self):
-        handlers = [
-            (r"/", IndexHandler)
-        ]
-        app_settings = {
-        }
-        super().__init__(port=8000, handlers=handlers, **app_settings)
-
+def _init_app_settings():
+    return {
+        'debug': True
+    }
 
 def main():
-    app = UntitledApplication()
-    web.run(application=app)
+    handlers = _init_handlers()
+    app_settings = _init_app_settings()
+    app_config = web.AppConfig(handlers=handlers, app_settings=app_settings, port=8080, env='DEV', app_name='untitled')
+    web.run(app_config=app_config)
 
 if __name__ == "__main__":
     main()
+
 ```

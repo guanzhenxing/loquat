@@ -1,4 +1,5 @@
 import logging
+import os
 import signal
 import time
 
@@ -9,26 +10,86 @@ import tornado.web
 
 logger = logging.getLogger(__name__)
 
+# Make filepaths relative to settings.
+here = os.path.dirname(os.path.abspath(__file__))
+pardir = os.path.abspath(os.path.join(here, os.path.pardir))
+
+
+class DeploymentType:
+    SOLO = "SOLO"  # 也就是本地模式
+    DEV = "DEV"  # 开发环境
+    QA = "QA"  # 测试环境
+    UAT = "UAT"  # 预生产环境
+    PROD = "PROD"  # 生产环境
+    dict = {
+        SOLO: "SOLO",
+        DEV: "DEV",
+        QA: "QA",
+        UAT: "UAT",
+        PROD: "PROD"
+    }
+
+
+class AppConfig(object):
+    def __init__(self, *args, **kwargs):
+        self.app_name = ''
+        self.port = 8000
+        self.env = 'SOLO'
+        self.handlers = []
+        self.app_settings = {}
+
+        if kwargs:
+            self.set_config(**kwargs)
+
+    def set_config(self, **kwargs):
+
+        config = kwargs.copy()
+
+        try:
+            self.app_name = config['app_name']
+            del config['app_name']
+        except KeyError:
+            pass  # Leave what was set or default
+
+        try:
+            self.port = config['port']
+            del config['port']
+        except KeyError:
+            pass  # Leave what was set or default
+
+        try:
+            self.env = config['env']
+            del config['env']
+        except KeyError:
+            pass
+
+        try:
+            self.handlers = config['handlers']
+            del config['handlers']
+        except KeyError:
+            pass
+
+        try:
+            self.app_settings = config['app_settings']
+            del config['app_settings']
+        except KeyError:
+            pass
+
 
 class Application(tornado.web.Application):
-    def __init__(self, port=8000, handlers=[], **app_settings):
-        super(Application, self).__init__(handlers, **app_settings)
+    """Loquat Application"""
 
-        self._port = port
+    def __init__(self, app_config: AppConfig):
+        self.app_config = app_config
 
-        logger.debug('Init loquat.Application')
+        super(Application, self).__init__(app_config.handlers, **app_config.app_settings)
 
-    @property
-    def port(self):
-        return self._port
+        logger.debug('Inited Loquat Application')
 
 
 def shutdown_sig_handler(sig, frame):
-    """
-    处理关闭服务的信号
-    :param sig:
-    :param frame:
-    """
+    """handle shutdown signal"""
+
     logger.warning('caught signal: %s', sig)
 
     max_wait_seconds_before_shutdown = 1
@@ -55,27 +116,20 @@ def shutdown_sig_handler(sig, frame):
     tornado.ioloop.IOLoop.instance().add_callback(shutdown)
 
 
-def _init_default_application():
-    from loquat.settings import default_config
+def run(app_config: AppConfig):
+    """run web application"""
 
-    port = default_config['port']
-    handlers = default_config['handlers']
-    app_settings = default_config['app_settings']
-
-    return Application(port=port, handlers=handlers, **app_settings)
-
-
-def run(application: Application) -> object:
     global server
+    if not app_config:
+        app_config = AppConfig()
 
-    if not application:
-        application = _init_default_application()
+    application = Application(app_config)
 
     server = tornado.httpserver.HTTPServer(application, xheaders=True)
-    server.listen(application.port)
-
-    logger.info("Started on port %s." % (application.port,))
+    server.listen(app_config.port)
+    logger.info("%s started on port %s." % (app_config.app_name, app_config.port,))
 
     signal.signal(signal.SIGTERM, shutdown_sig_handler)
     signal.signal(signal.SIGINT, shutdown_sig_handler)
+
     tornado.ioloop.IOLoop.instance().start()
