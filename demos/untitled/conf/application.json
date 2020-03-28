@@ -1,0 +1,5 @@
+{
+  "env": "SOLO",
+  "port": 8080,
+  "log_file": "~/Workspace/logs"
+}
