@@ -8,6 +8,10 @@ Loquat is a web framework based on Tornado.
 
 ## Installation
 
+```shell
+pip install loquat
+```
+
 ## Simple uses
 
 ```python
