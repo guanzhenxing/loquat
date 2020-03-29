@@ -1,6 +1,7 @@
 import os
 import signal
 import time
+from typing import Any
 
 import tornado.escape
 import tornado.ioloop
@@ -36,6 +37,7 @@ class AppConfig(object):
         self.env = 'SOLO'
         self.handlers = []
         self.app_settings = {}
+        self.app_properties = {}
 
         if kwargs:
             self.set_config(**kwargs)
@@ -74,16 +76,32 @@ class AppConfig(object):
         except KeyError:
             pass
 
+        try:
+            self.app_properties = config['app_properties']
+        except KeyError:
+            pass
+
 
 class Application(tornado.web.Application):
     """Loquat Application"""
 
     def __init__(self, app_config: AppConfig):
-        self.app_config = app_config
 
         super(Application, self).__init__(app_config.handlers, **app_config.app_settings)
 
+        self.app_config = app_config
+
+        # 设置application的属性
+        for name in self.app_config.app_properties.keys():
+            self.__setattr__(name, self.app_config.app_properties.get(name))
+
         loquat_logger.debug('Inited Loquat Application')
+
+    def __getattr__(self, key):
+        try:
+            return self[key]
+        except KeyError:
+            raise AttributeError(key)
 
 
 def shutdown_sig_handler(sig, frame):
@@ -123,6 +141,7 @@ def run(app_config: AppConfig):
         app_config = AppConfig()
 
     application = Application(app_config)
+
     server = tornado.httpserver.HTTPServer(application, xheaders=True)
     server.listen(app_config.port)
 
