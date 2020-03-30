@@ -1,23 +1,61 @@
-from loquat import web
+from loquat.handlers.base import BaseHandler
+from loquat.middlewares.base import BaseMiddleware, MiddlewareType
+from loquat.server import Server
+from loquat.web import Application
 
-from config import init_handlers, init_app_settings, untitled_logger, init_middlewares
 
-handlers = init_handlers()
+class BeforeRequestMW(BaseMiddleware):
 
-middlewares = init_middlewares()
+    def __init__(self, mw_order=0, mw_type=MiddlewareType.BEFORE_REQUEST):
+        super().__init__(mw_order, mw_type)
 
-app_settings = init_app_settings()
-app_properties = {
-    'log': untitled_logger
-}
+    def should_run(self, handler, *args, **kwargs) -> bool:
+        return False
 
-app_config = web.AppConfig(handlers=handlers, app_settings=app_settings, middlewares=middlewares,
-                           port=8080, env='DEV', app_name='untitled', app_properties=app_properties)
+    def run(self, handler, *args, **kwargs):
+        print('run before_request_mw')
+
+
+class AfterResponseMW(BaseMiddleware):
+
+    def __init__(self, mw_order=0, mw_type=MiddlewareType.AFTER_RESPONSE):
+        super().__init__(mw_order, mw_type)
+
+    def should_run(self, handler, *args, **kwargs) -> bool:
+        return True
+
+    def run(self, handler, *args, **kwargs):
+        print('run after_response_mw')
+
+
+class IndexHandler(BaseHandler):
+
+    def initialize(self, database):
+        self.database = database
+
+    def get(self):
+        self.write("hello world!")
+
+
+class TestApplication(Application):
+
+    def __init__(self, handlers=None, middlewares=None, transforms=None):
+        super().__init__(handlers, middlewares, transforms)
 
 
 def main():
-    untitled_logger.info('Will run.....')
-    web.run(app_config=app_config)
+    handlers = [
+        (r"/", IndexHandler, dict(database="this is database"))
+    ]
+
+    middlewares = [
+        BeforeRequestMW,
+        AfterResponseMW,
+    ]
+
+    application = TestApplication(handlers=handlers, middlewares=middlewares)
+    server = Server(application, config={'port': 9000})
+    server.start()
 
 
 if __name__ == "__main__":

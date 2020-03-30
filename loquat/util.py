@@ -1,10 +1,15 @@
 import copy
+import os
 from typing import Any, Dict
 
 unicode_type = str
 basestring_type = str
 
 copy_list = (lambda lb: copy(lb) if lb else [])
+
+app_dir = os.path.dirname(os.path.abspath(__name__))
+
+app_pardir = os.path.abspath(os.path.join(app_dir, os.path.pardir))
 
 
 class ObjectDict(Dict[str, Any]):

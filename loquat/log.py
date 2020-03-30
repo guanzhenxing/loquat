@@ -70,7 +70,7 @@ class LogFormatter(logging.Formatter):
     Log formatter used in Tornado.
     """
 
-    DEFAULT_FORMAT = "%(color)s %(asctime)s %(levelname)s --- [%(process)d %(threadName)s] %(name)s - " \
+    DEFAULT_FORMAT = "%(color)s%(asctime)s %(levelname)s --- [%(process)d %(threadName)s] %(name)s - " \
                      "%(filename)s %(lineno)d : %(end_color)s %(message)s"
     DEFAULT_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
     DEFAULT_COLORS = {
@@ -188,13 +188,13 @@ def _pretty_logging(options: Dict, logger: logging.Logger) -> None:
             )
         else:
             error_message = (
-                    "The value of log_rotate_mode option should be "
-                    + '"size" or "time", not "%s".' % rotate_mode
+                    'The value of log_rotate_mode option should be "size" or "time", not "%s".' % rotate_mode
             )
             raise ValueError(error_message)
         channel.setFormatter(LogFormatter(color=False))
         # 添加通过级别过滤
-        channel.addFilter(ExactLogLevelFilter(logging.getLevelName(options['logging_level'])))
+        if options['log_to_level_files']:
+            channel.addFilter(ExactLogLevelFilter(logging.getLevelName(options['logging_level'])))
         logger.addHandler(channel)
 
     if options['log_to_stream'] or (options['log_to_stream'] is False and not logger.handlers):
@@ -220,6 +220,7 @@ def _log_level_files(default_options, logger):
             os.makedirs(os.path.dirname(log_path))
 
         default_options.update({'log_file_path': log_path, 'logging_level': level})
+
         _pretty_logging(options=default_options, logger=logger)
 
 
@@ -249,11 +250,11 @@ def initialize_logging(logger: logging.Logger = None, options: Dict = None):
 
     default_options = {
         'log_file_path': '',
-        'logging_level': 'INFO',
+        'logging_level': 'DEBUG',
         'log_to_level_files': False,
-        'log_to_stream': False,
+        'log_to_stream': True,
         'log_file_max_size': 100 * 1000 * 1000,
-        'log_file_num_backups': 10,
+        'log_file_num_backups': 30,
         'log_rotate_when': 'D',
         'log_rotate_interval': 1,
         'log_rotate_mode': 'time'
@@ -269,4 +270,5 @@ def initialize_logging(logger: logging.Logger = None, options: Dict = None):
         _pretty_logging(options=default_options, logger=logger)
 
 
-loquat_logger = logging.getLogger('loquat')
+root_null_logger = logging.getLogger()
+root_null_logger.addHandler(NullHandler())

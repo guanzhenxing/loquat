@@ -15,30 +15,32 @@ pip install loquat
 ## Simple uses
 
 ```python
-import loquat
-from loquat import web
 from loquat.handlers.base import BaseHandler
-from loquat.utils import utils
+from loquat.server import Server
+from loquat.web import Application
 
 class IndexHandler(BaseHandler):
+
+    def initialize(self, database):
+        self.database = database
+
     def get(self):
-        self.render('index.html')
+        self.write("hello world!")
 
-def _init_handlers():
-    return [
-        (r"/", IndexHandler)
-    ]
 
-def _init_app_settings():
-    return {
-        'debug': True
-    }
+class TestApplication(Application):
+    def __init__(self, handlers=None, middlewares=None, transforms=None):
+        super().__init__(handlers, middlewares, transforms)
 
 def main():
-    handlers = _init_handlers()
-    app_settings = _init_app_settings()
-    app_config = web.AppConfig(handlers=handlers, app_settings=app_settings, port=8080, env='DEV', app_name='untitled')
-    web.run(app_config=app_config)
+    handlers = [
+        (r"/", IndexHandler, dict(database="this is database"))
+    ]
+
+    application = TestApplication(handlers=handlers)
+    server = Server(application)
+    server.start()
+
 
 if __name__ == "__main__":
     main()
