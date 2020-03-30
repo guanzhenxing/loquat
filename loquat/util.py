@@ -4,6 +4,8 @@ from typing import Any, Dict
 unicode_type = str
 basestring_type = str
 
+copy_list = (lambda lb: copy(lb) if lb else [])
+
 
 class ObjectDict(Dict[str, Any]):
     """Makes a dictionary behave like an object, with attribute-style access.

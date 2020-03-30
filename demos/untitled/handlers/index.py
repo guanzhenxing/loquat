@@ -1,11 +1,13 @@
-import logging
-
 from loquat.handlers.base import BaseHandler
-
-logger = logging.getLogger(__name__)
 
 
 class IndexHandler(BaseHandler):
+
+    def initialize(self, database):
+        self.database = database
+
     def get(self):
-        print(">>>")
-        self.render('index.html')
+        self.application.log.info('>>>>>>>>>>>')
+        self.application.log.info(self)
+        self.application.log.info('>>>>>>>>>>>')
+        self.write("<<<<")

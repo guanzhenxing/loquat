@@ -36,6 +36,8 @@ class AppConfig(object):
         self.env = 'SOLO'
         self.handlers = []
         self.app_settings = {}
+        self.app_properties = {}
+        self.middlewares = []
 
         if kwargs:
             self.set_config(**kwargs)
@@ -74,16 +76,57 @@ class AppConfig(object):
         except KeyError:
             pass
 
+        try:
+            app_properties = config['app_properties'] if 'app_properties' in config.keys() else {}
+            self.app_properties = {**self.app_properties, **app_properties}
+            del config['app_properties']
+        except KeyError:
+            pass
+
+        try:
+            self.middlewares = config['middlewares']
+            del config['middlewares']
+        except KeyError:
+            pass
+
 
 class Application(tornado.web.Application):
     """Loquat Application"""
 
     def __init__(self, app_config: AppConfig):
-        self.app_config = app_config
 
         super(Application, self).__init__(app_config.handlers, **app_config.app_settings)
 
+        self.app_config = app_config  # 赋值app_config
+
+        self._init_middlewares()  # 初始化中间件
+
+        self._init_app_properties()  # 设置application的属性
+
         loquat_logger.debug('Inited Loquat Application')
+
+    def _init_app_properties(self):
+        """
+        设置application的属性
+        """
+        for name in self.app_config.app_properties.keys():
+            self.__setattr__(name, self.app_config.app_properties.get(name))
+
+    def _init_middlewares(self):
+        """
+        初始化中间件
+        """
+        self.middlewares = []
+        for middleware_cls in self.app_config.middlewares:
+            middleware_instance = middleware_cls()
+            self.middlewares.append(middleware_instance)
+        self.middlewares = sorted(self.middlewares, key=lambda m: m.mw_order)
+
+    def __getattr__(self, key):
+        try:
+            return self[key]
+        except KeyError:
+            raise AttributeError(key)
 
 
 def shutdown_sig_handler(sig, frame):
@@ -123,6 +166,7 @@ def run(app_config: AppConfig):
         app_config = AppConfig()
 
     application = Application(app_config)
+
     server = tornado.httpserver.HTTPServer(application, xheaders=True)
     server.listen(app_config.port)
 
