@@ -1,7 +1,8 @@
-from loquat.handlers.base import BaseHandler
-from loquat.middlewares.base import BaseMiddleware, MiddlewareType
+from loquat.middleware import BaseMiddleware, MiddlewareType
 from loquat.server import Server
 from loquat.web import Application
+
+from handler import BaseHandler
 
 
 class BeforeRequestMW(BaseMiddleware):
@@ -10,7 +11,7 @@ class BeforeRequestMW(BaseMiddleware):
         super().__init__(mw_order, mw_type)
 
     def should_run(self, handler, *args, **kwargs) -> bool:
-        return False
+        return True
 
     def run(self, handler, *args, **kwargs):
         print('run before_request_mw')
