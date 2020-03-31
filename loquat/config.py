@@ -1,7 +1,7 @@
 import json
 import os
 
-from .util import app_dir
+from util import app_dir
 
 
 class DeploymentType:
@@ -39,7 +39,7 @@ default_config = {
         'log_rotate_interval': 1,
         'log_rotate_mode': 'time'
     },
-    'middleware_classes': []
+    'middleware_classes': ['middleware.MixinHandlerMiddleware']
 }
 
 

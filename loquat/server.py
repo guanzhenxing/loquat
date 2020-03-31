@@ -8,9 +8,9 @@ import tornado.locks
 import tornado.web
 from tornado.options import options
 
-from .log import initialize_logging
-from .config import load_config_dir
-from .web import Application
+from log import initialize_logging
+from config import load_config_dir
+from web import Application
 
 logger = logging.getLogger(__name__)
 
@@ -20,10 +20,6 @@ def define_server_options():
 
     options.define('profile', default='', help='', type=str)
     options.define('config_dir', default='', help='', type=str)
-
-
-define_server_options()
-options.parse_command_line()
 
 
 class Server(object):
@@ -104,3 +100,12 @@ class Server(object):
             stop_loop()
 
         self.ioloop.add_callback(shutdown)
+
+
+def server_start(application: Application):
+    server = Server(application)
+    server.start()
+
+
+define_server_options()
+options.parse_command_line()
