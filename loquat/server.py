@@ -8,10 +8,12 @@ import tornado.locks
 import tornado.web
 from tornado.options import options
 
-from log import initialize_logging
+from log import initialize_logging, NullHandler
 from config import load_config_dir
 from web import Application
 
+# 这里是为了Tornado不初始化日志
+logging.getLogger().addHandler(NullHandler())
 logger = logging.getLogger(__name__)
 
 
@@ -22,6 +24,10 @@ def define_server_options():
     options.define('config_dir', default='', help='', type=str)
 
 
+define_server_options()
+options.parse_command_line()
+
+
 class Server(object):
     def __init__(self, application: Application = None, ioloop: object = None, **kwargs):
         """
@@ -29,6 +35,7 @@ class Server(object):
         @param ioloop: An I/O event loop.
         @param kwargs: 可变参数，可选参数有：
             - config: 配置
+            - config_dir： 配置的目录
         """
         self.application = application
         self.ioloop = ioloop
@@ -38,7 +45,17 @@ class Server(object):
         initialize_logging(options=self.config['log'])
 
     def _set_config(self, **kwargs):
-        """设置服务配置"""
+        """设置服务配置
+
+        配置优先级：
+            1- 系统运行时传入的配置文件
+            2- Server初始化时候的配置
+            3- 默认的配置文件
+        """
+
+        if kwargs:
+            if 'config' in kwargs.keys():
+                self.config = kwargs['config']
 
         # 初始化配置
         config_dir = ''
@@ -47,11 +64,6 @@ class Server(object):
         if options.config_dir:  # 如果存在 options.config_dir
             config_dir = options.config_dir
         self.config = load_config_dir(config_dir, options.profile)
-
-        # 处理 kwargs
-        if kwargs:
-            if 'config' in kwargs.keys() and type(kwargs['config']) is dict:
-                self.config = {**self.config, **kwargs['config']}
 
     def start(self):
         """开始服务"""
@@ -105,7 +117,3 @@ class Server(object):
 def server_start(application: Application):
     server = Server(application)
     server.start()
-
-
-define_server_options()
-options.parse_command_line()

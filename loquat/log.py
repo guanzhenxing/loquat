@@ -197,7 +197,7 @@ def _pretty_logging(options: Dict, logger: logging.Logger) -> None:
             channel.addFilter(ExactLogLevelFilter(logging.getLevelName(options['logging_level'])))
         logger.addHandler(channel)
 
-    if options['log_to_stream'] or (options['log_to_stream'] is False and not logger.handlers):
+    if options['log_to_stderr'] or (options['log_to_stderr'] is False and not logger.handlers):
         # Set up color if we are in a tty and curses is installed
         channel = logging.StreamHandler()
         channel.setFormatter(LogFormatter())
@@ -232,7 +232,7 @@ def initialize_logging(logger: logging.Logger = None, options: Dict = None):
         'log_file_path':'日志文件路径。如果log_level_files==True则为目录，否则为文件路径',
         'logging_level':'日志级别（DEBUG/INFO/WARN/ERROR）',
         'log_to_level_files':'是否按照日志的级别分别记录。默认为False',
-        'log_to_stream':'是否将日志输出发送到stream（如果可能的话，将其着色）。如果未配置其他日志记录，则默认使用stream。',
+        'log_to_stderr':'是否将日志输出发送到stream（如果可能的话，将其着色）。如果未配置其他日志记录，则默认使用stream。',
         'log_file_max_size':'每个文件最大的大小，默认：100 * 1000 * 1000',
         'log_file_num_backups':'要保留的日志文件数',
         'log_rotate_when':'时间间隔的类型（'S', 'M', 'H', 'D', 'W0'-'W6'）',
@@ -252,7 +252,7 @@ def initialize_logging(logger: logging.Logger = None, options: Dict = None):
         'log_file_path': '',
         'logging_level': 'DEBUG',
         'log_to_level_files': False,
-        'log_to_stream': True,
+        'log_to_stderr': True,
         'log_file_max_size': 100 * 1000 * 1000,
         'log_file_num_backups': 30,
         'log_rotate_when': 'D',
@@ -268,7 +268,3 @@ def initialize_logging(logger: logging.Logger = None, options: Dict = None):
         _log_level_files(default_options, logger)
     else:
         _pretty_logging(options=default_options, logger=logger)
-
-
-root_null_logger = logging.getLogger()
-root_null_logger.addHandler(NullHandler())

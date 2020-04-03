@@ -32,14 +32,14 @@ default_config = {
         'log_file_path': app_dir + '/app.log',
         'logging_level': 'DEBUG',
         'log_to_level_files': False,
-        'log_to_stream': True,
+        'log_to_stderr': True,
         'log_file_max_size': 100 * 1000 * 1000,
         'log_file_num_backups': 30,
         'log_rotate_when': 'D',
         'log_rotate_interval': 1,
         'log_rotate_mode': 'time'
     },
-    'middleware_classes': ['middleware.MixinHandlerMiddleware']
+    'middleware_classes': []
 }
 
 

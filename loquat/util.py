@@ -1,5 +1,6 @@
 import copy
 import os
+from collections import Iterable
 from typing import Any, Dict
 
 unicode_type = str
@@ -77,6 +78,24 @@ def dict_to_str(origin_value, encode=None):
     return value
 
 
+def to_str(v, encode=None):
+    """convert any list, dict, iterable and primitives object to string
+    """
+    if isinstance(v, basestring_type):
+        return v
+
+    if isinstance(v, dict):
+        return dict_to_str(v, encode)
+
+    if isinstance(v, Iterable):
+        return list_to_str(v, encode)
+
+    if encode:
+        return encode(v)
+    else:
+        return v
+
+
 def camel_to_underscore(name):
     """
     convert CamelCase style to under_score_case
@@ -119,18 +138,3 @@ def import_object(name: str) -> Any:
         return getattr(obj, parts[-1])
     except AttributeError:
         raise ImportError("No module named %s" % parts[-1])
-
-# class Convert(object):
-#     __slots__ = ['list_to_str', 'dict_to_str']
-#
-#     def __init__(self) -> None:
-#         super().__init__()
-#
-#     def __getattr__(self, name):
-#         if name in self.__slots__:
-#             return globals().get(name)
-#
-#         raise AttributeError('Convert has no attribute %s' % name)
-#
-#
-# convert = Convert()
