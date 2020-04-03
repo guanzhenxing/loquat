@@ -41,7 +41,7 @@ class IndexHandler(BaseHandler):
 class TestApplication(Application):
 
     def __init__(self, handlers=None, middlewares=None, transforms=None):
-        super().__init__(handlers, middlewares, transforms)
+        super().__init__(handlers)
 
 
 def main():

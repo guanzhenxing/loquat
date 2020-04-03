@@ -194,7 +194,6 @@ class MixinHandlerMiddleware(BaseMiddleware):
         return self.mm_should
 
     def run(self, application, *args, **kwargs) -> None:
-        print('>>>>>>>>')
         if self.mm_should:
             from handler import BaseHandler, MiddlewareHandlerMixin
             # 一定要将BaseHandler.__bases__ 写后面，这样才能覆盖，使用MiddlewareHandlerMixin中的方法
