@@ -58,3 +58,8 @@ class BaseHandler(_PatchHandler):
 
     def __init__(self, application: "Application", request: httputil.HTTPServerRequest, **kwargs: Any) -> None:
         super().__init__(application, request, **kwargs)
+
+
+class RestfulHandler(BaseHandler):
+    def __init__(self, application, request, **kwargs: Any) -> None:
+        super().__init__(application, request, **kwargs)

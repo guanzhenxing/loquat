@@ -8,12 +8,12 @@ from setuptools import find_packages, setup, Command
 # Package meta-data.
 NAME = 'loquat'
 DESCRIPTION = 'A simple web framework based on Tornado.'
-URL = 'https://github.com/guanzhenxing/loquat.git'
+URL = 'https://github.com/guanzhenxing/loquat'
 EMAIL = 'guan.zhenxing@foxmail.com'
 AUTHOR = 'Jesen Kwan'
 REQUIRES_PYTHON = '>=3.5.0'
-VERSION = '0.1.5'
-KEYWORDS = 'tornado,web framework'
+VERSION = '0.1.6'
+KEYWORDS = 'tornado,tornado-application,tornado-framework,tornado-web'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
@@ -115,7 +115,7 @@ setup(
         'Programming Language :: Python :: Implementation :: PyPy',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
-        'Topic :: Database',
+        'Topic :: Libraries',
     ],
     # $ setup.py publish support.
     cmdclass={
