@@ -8,9 +8,9 @@ import tornado.locks
 import tornado.web
 from tornado.options import options
 
-from log import initialize_logging, NullHandler
-from config import load_config_dir
-from web import Application
+from .log import initialize_logging, NullHandler
+from .config import load_config_dir
+from .web import Application
 
 # 这里是为了Tornado不初始化日志
 logging.getLogger().addHandler(NullHandler())
