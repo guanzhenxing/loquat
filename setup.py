@@ -115,7 +115,7 @@ setup(
         'Programming Language :: Python :: Implementation :: PyPy',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
-        'Topic :: Libraries',
+        'Topic :: Application Frameworks',
     ],
     # $ setup.py publish support.
     cmdclass={
