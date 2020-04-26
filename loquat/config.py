@@ -1,7 +1,7 @@
 import json
 import os
 
-from util import app_dir
+from .util import app_dir
 
 
 class DeploymentType:

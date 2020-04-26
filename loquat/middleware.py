@@ -2,8 +2,8 @@ import inspect
 import logging
 from abc import ABCMeta, abstractmethod
 
-from exception import ArgumentError
-from util import import_object
+from .exception import ArgumentError
+from .util import import_object
 
 logger = logging.getLogger(__name__)
 

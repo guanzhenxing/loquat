@@ -1,8 +1,8 @@
 import tornado.web
 
-from exception import ArgumentError
-from middleware import MiddlewareManager, MiddlewareType
-from config import load_config_dir
+from .exception import ArgumentError
+from .middleware import MiddlewareManager, MiddlewareType
+from .config import load_config_dir
 
 
 class Application(tornado.web.Application):

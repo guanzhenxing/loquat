@@ -4,7 +4,7 @@ from typing import Optional, Awaitable, Any, Union
 import tornado.web
 from tornado import httputil
 
-from middleware import MiddlewareType
+from .middleware import MiddlewareType
 
 logger = logging.getLogger(__name__)
 

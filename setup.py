@@ -12,7 +12,7 @@ URL = 'https://github.com/guanzhenxing/loquat'
 EMAIL = 'guan.zhenxing@foxmail.com'
 AUTHOR = 'Jesen Kwan'
 REQUIRES_PYTHON = '>=3.5.0'
-VERSION = '0.1.6'
+VERSION = '0.1.7'
 KEYWORDS = 'tornado,tornado-application,tornado-framework,tornado-web'
 
 # What packages are required for this module to be executed?
@@ -115,7 +115,7 @@ setup(
         'Programming Language :: Python :: Implementation :: PyPy',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
-        'Topic :: Libraries',
+        'Topic :: Application Frameworks',
     ],
     # $ setup.py publish support.
     cmdclass={
